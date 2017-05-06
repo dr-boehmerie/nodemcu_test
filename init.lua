@@ -24,6 +24,7 @@ function startupWlan()
 	function waitWlan()
 		if (abort ~= false) then
 			tmr.stop(0)
+			wifi.sta.disconnect()
 			print("Wait aborted")
 			abort = nil
 			return
