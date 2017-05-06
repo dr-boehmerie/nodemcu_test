@@ -84,6 +84,8 @@ function draw_loop()
 			--	node.task.post(update_bme280)
 				-- update readings every 3 seconds
 				tmr.alarm(0, 3000, tmr.ALARM_SINGLE, update_bme280)
+			else
+				print("Abort!")
 			end
         end
     end
@@ -113,7 +115,7 @@ function init_bme280()
 --	cold_start = 1
 	-- initialize bme280
 	--result = bme280.init(sda,scl,temp_oss,press_oss,humi_oss,power_mode,inactive_duration,iir_filter,cold_start)
-	local result = bme280.init(sda,scl)
+	local result = bme280.init(sda,scl,1,1,1,0,4,0,1)
 	-- nil if not connected, 2 for bme280, 1 for bmp280
 	if (result == 2) then
 		print("BME280 found!")
@@ -143,13 +145,18 @@ function read_bme280()
 		--if (P ~= nil and QNH ~= nil) then
 		--	curAlt = bme280.altitude(P, QNH)
 		--end
+	else
+		print("No BME280!")
 	end
 	-- start draw loop
 	node.task.post(draw_loop)
 end
 
 function update_bme280()
-	node.task.post(read_bme280)
+--	node.task.post(read_bme280)
+	if (bme280_ok == 1) then
+		bme280.startreadout(0, function() node.task.post(read_bme280) end)
+	end
 end
 
 init_display()
